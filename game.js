@@ -63,7 +63,7 @@ GameState.prototype.create = function() {
 		Phaser.Keyboard.DOWN
 	]);
 
-  this.flowerIsOpen = true;
+  this.flowerIsOpen = false;
   this.addFlower();
 };
 
@@ -72,9 +72,6 @@ GameState.prototype.addFlower = function(){
   this.flower = this.game.add.sprite(this.game.width - 300, this.game.height - 143, type+'flower');
   this.game.physics.enable(this.flower)
   this.flower.body.allowGravity = false;
-  if(this.flowerIsOpen) {
-    this.flower.scale.setTo(1,1.7)
-  }
 }
 
 GameState.prototype.swapFlower = function() {
