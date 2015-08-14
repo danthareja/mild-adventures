@@ -8,8 +8,9 @@ var uglify = require('gulp-uglify');
 var gulpif = require('gulp-if');
 var exorcist = require('exorcist');
 var babelify = require('babelify');
+var ghPages = require('gulp-gh-pages')
 var browserify = require('browserify');
-var ghPages = require('gulp-gh-pages');
+var imagemin = require('gulp-imagemin');
 var browserSync = require('browser-sync');
 var htmlreplace = require('gulp-html-replace');
 
@@ -31,23 +32,18 @@ var keepFiles = false;
  * Simple way to check for development/production mode.
  */
 function isProduction() {
-  return argv.production || argv.deploy;
+  return argv.production;
 }
 
-/**
- * Simple way to check for deployment mode.
- */
-function isDeployment() {
-  return argv.deploy;
+function toggleProduction() {
+  argv.production = true;
 }
 
 /**
  * Logs the current build mode on the console.
  */
 function logBuildMode() {
-  if (isDeployment()) {
-    gutil.log(gutil.colors.green('Running DEPLOYMENT build...'));
-  } else if (isProduction()) {
+  if (isProduction()) {
     gutil.log(gutil.colors.green('Running PRODUCTION build...'));
   } else {
     gutil.log(gutil.colors.yellow('Running DEVELOPMENT build...'));
@@ -85,7 +81,11 @@ function copyIndex() {
  * Check out README.md for more info on the '/assets' folder.
  */
 function copyAssets() {
+
   return gulp.src(ASSETS_PATH + '/**/*')
+    .pipe(gulpif(isProduction(), imagemin({
+      progressive: true
+    })))
     .pipe(gulp.dest(BUILD_PATH + '/' + ASSETS_PATH));
 }
 
@@ -143,7 +143,6 @@ function build() {
   .pipe(source(OUTPUT_FILE))
   .pipe(buffer())
   .pipe(gulpif(isProduction(), uglify()))
-  .pipe(gulpif(isDeployment(), ghPages()))
   .pipe(gulp.dest(SCRIPTS_PATH));
 }
 
@@ -156,18 +155,28 @@ function serve() {
     server: {
       baseDir: BUILD_PATH
     },
-    open: true // Change it to true if you wish to allow Browsersync to open a browser window.
+    open: false // Change it to true if you wish to allow Browsersync to open a browser window.
   };
   
   browserSync(options);
   
   // Watches for changes in files inside the './src' folder.
-  gulp.watch(SOURCE_PATH + '/**/*.js', ['watch-js']);
+  gulp.watch(SOURCE_PATH + '/**/*.js', ['watch:js']);
   
   // Watches for changes in files inside the './static' folder. Also sets 'keepFiles' to true (see cleanBuild()).
-  gulp.watch(ASSETS_PATH + '/**/*', ['watch-static']).on('change', function() {
+  gulp.watch(ASSETS_PATH + '/**/*', ['watch:static']).on('change', function() {
     keepFiles = true;
   });
+}
+
+
+/**
+ * Deploy to Github Pages.
+ */
+function deploy() {
+  return gulp.src([BUILD_PATH + '/**/*'])
+    .pipe(gulp.dest('.tmp'))
+    .pipe(ghPages());
 }
 
 gulp.task('cleanBuild', cleanBuild);
@@ -176,8 +185,11 @@ gulp.task('copyPhaser', ['copyStatic'], copyPhaser);
 gulp.task('build', ['copyPhaser'], build);
 gulp.task('fastBuild', build);
 gulp.task('serve', ['build'], serve);
-gulp.task('watch-js', ['fastBuild'], browserSync.reload); // Rebuilds and reloads the project when executed.
-gulp.task('watch-static', ['copyPhaser'], browserSync.reload);
+gulp.task('watch:js', ['fastBuild'], browserSync.reload); // Rebuilds and reloads the project when executed.
+gulp.task('watch:static', ['copyPhaser'], browserSync.reload);
+gulp.task('toggleProduction', toggleProduction);
+gulp.task('deploy', ['toggleProduction', 'build'], deploy);
+
 /**
  * The tasks are executed in the following order:
  * 'cleanBuild' -> 'copyStatic' -> 'copyPhaser' -> 'build' -> 'serve'

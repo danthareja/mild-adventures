@@ -14,4 +14,4 @@ gulp
 ```
 
 ## Easy deployment
-Run `gulp --production` to build for production or `gulp --deploy` to deploy to gh-pages.
+Run `gulp --production` to build for production or `gulp deploy` (note inconsistent flag use) to deploy to gh-pages.
