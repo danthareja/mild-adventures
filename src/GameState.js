@@ -10,10 +10,10 @@ class GameState {
   }
 
   preload() {
-    this.game.load.atlasJSONHash('adventurer', 'assets/adventurer/adventurer.png', 'assets/adventurer/adventurer.json')
+    this.game.load.atlasJSONHash('adventurer', 'assets/adventurer.png', 'assets/adventurer.json')
     this.game.load.image('ground', 'assets/ground-01.png');
-    this.game.load.image('open_flower', 'assets/flower/open.png');
-    this.game.load.image('closed_flower', 'assets/flower/closed.png');
+    this.game.load.image('open_flower', 'assets/flower_open.png');
+    this.game.load.image('closed_flower', 'assets/flower_closed.png');
   }
 
   create() {
