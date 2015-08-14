@@ -1,3 +1,5 @@
+var Keyboard = require('./Keyboard');
+
 var Adventurer = function(game, x, y, frame) {
   Phaser.Sprite.call(this, game, x, y, 'adventurer', frame);
 
@@ -111,3 +113,6 @@ Adventurer.prototype.addAnimations = function() {
     'walk-left-6.png'
   ], 10, true, false);
 }
+
+module.exports = Adventurer;
+

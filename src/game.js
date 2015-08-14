@@ -1,3 +1,8 @@
+var Ground = require('./Ground');
+var Flower = require('./Flower');
+var Keyboard = require('./Keyboard');
+var Adventurer = require('./Adventurer');
+
 var GameState = function(game) {
   this.GRAVITY = 2600; // pixels/second/second
 };

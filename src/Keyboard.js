@@ -76,3 +76,5 @@ Keyboard.prototype.downInputIsActive = function() {
 
   return isActive;
 };
+
+module.exports = Keyboard;

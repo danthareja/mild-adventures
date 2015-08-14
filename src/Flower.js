@@ -15,3 +15,5 @@ Flower.prototype.swap = function() {
   this.isOpen = !this.isOpen;
   this.loadTexture(this.isOpen ? 'open_flower' : 'closed_flower');
 }
+
+module.exports = Flower;

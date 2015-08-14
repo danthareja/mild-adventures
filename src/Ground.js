@@ -13,3 +13,5 @@ var Ground = function(game, x, y, frame) {
 
 Ground.prototype = Object.create(Phaser.Sprite.prototype);
 Ground.constructor = Ground;
+
+module.exports = Ground;

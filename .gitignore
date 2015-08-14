@@ -1,1 +1,4 @@
 .DS_Store
+.publish
+build/
+node_modules
