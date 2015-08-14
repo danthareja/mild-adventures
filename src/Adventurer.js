@@ -68,46 +68,46 @@ class Adventurer extends Phaser.Sprite {
   }
 
   addAnimations() {
-    this.animations.add('neutral', ['neutral.png'], 10)
-    this.animations.add('jump', ['jump-3.png', 'neutral.png'], 10);
+    this.animations.add('neutral', ['neutral'], 10)
+    this.animations.add('jump', ['jump-3', 'neutral'], 10);
     this.animations.add('neutral-to-right', [
-      'walk-right-1.png', 
-      'walk-right-2.png',
-      'walk-right-3.png'
+      'walk-right-1', 
+      'walk-right-2',
+      'walk-right-3'
     ], 10);
     this.animations.add('right-to-neutral', [
-      'walk-right-3.png',
-      'walk-right-2.png',
-      'walk-right-1.png',
-      'neutral.png'
+      'walk-right-3',
+      'walk-right-2',
+      'walk-right-1',
+      'neutral'
     ], 10);
     this.animations.add('walk-right', [
-      'walk-right-4.png',
-      'walk-right-5.png',
-      'walk-right-6.png',
-      'walk-right-7.png',
-      'walk-right-8.png',
-      'walk-right-6.png'
+      'walk-right-4',
+      'walk-right-5',
+      'walk-right-6',
+      'walk-right-7',
+      'walk-right-8',
+      'walk-right-6'
     ], 10, true, false);
 
     this.animations.add('neutral-to-left', [
-      'walk-left-1.png', 
-      'walk-left-2.png',
-      'walk-left-3.png'
+      'walk-left-1', 
+      'walk-left-2',
+      'walk-left-3'
     ], 20);
     this.animations.add('left-to-neutral', [
-      'walk-left-3.png',
-      'walk-left-2.png',
-      'walk-left-1.png',
-      'neutral.png'
+      'walk-left-3',
+      'walk-left-2',
+      'walk-left-1',
+      'neutral'
     ], 10);
     this.animations.add('walk-left', [
-      'walk-left-4.png',
-      'walk-left-5.png',
-      'walk-left-6.png',
-      'walk-left-7.png',
-      'walk-left-8.png',
-      'walk-left-6.png'
+      'walk-left-4',
+      'walk-left-5',
+      'walk-left-6',
+      'walk-left-7',
+      'walk-left-8',
+      'walk-left-6'
     ], 10, true, false);
   }
 }

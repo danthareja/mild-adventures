@@ -20,7 +20,7 @@ class GameState {
     this.game.stage.backgroundColor = '#ffffff';
     this.game.physics.arcade.gravity.y = this.GRAVITY;
 
-    this.player = new Adventurer(this.game, this.game.width/2, this.game.height - 78, 'neutral.png');
+    this.player = new Adventurer(this.game, this.game.width/2, this.game.height - 78, 'neutral');
     this.game.add.existing(this.player);
 
     this.ground = new Ground(this.game, 0, this.game.height - 40);
