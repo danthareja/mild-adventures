@@ -1,3 +1,4 @@
+var os = require('os');
 var del = require('del');
 var gulp = require('gulp');
 var argv = require('yargs').argv;
@@ -175,8 +176,9 @@ function serve() {
  */
 function deploy() {
   return gulp.src([BUILD_PATH + '/**/*'])
-    .pipe(gulp.dest('.tmp'))
-    .pipe(ghPages());
+    .pipe(ghPages({
+      cacheDir: os.tmpDir() + '/.publish'
+    }));
 }
 
 gulp.task('cleanBuild', cleanBuild);
