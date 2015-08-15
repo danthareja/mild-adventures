@@ -5,17 +5,21 @@ class Adventurer extends Phaser.Sprite {
     super(game, x, y, 'adventurer', frame);
 
     // Define movement constants
-    this.MAX_SPEED = 500; // pixels/second
-    this.ACCELERATION = 1500; // pixels/second/second
+    this.MAX_SPEED = 400; // pixels/second
+    this.ACCELERATION = 1000; // pixels/second/second
+    this.TRANSITION_SPEED = 50;
     this.DRAG = 1000; // pixels/second
     this.JUMP_SPEED = -500; // pixels/second (negative y is up)
+    this.MIN_ANIMATION_SPEED = 5; // frames/second
+    this.MAX_ANIMATION_SPEED = 20; // frames/second
+    this.TRANSITION_ANIMATION_SPEED = 20; // frames/second
     
     // Flag to track if the jump button is pressed
     this.jumping = false;
 
-    this.addAnimations();
-
     this.keyboard = new Keyboard(game);
+
+    this.addAnimations();
 
     // Enable physics on the player
     game.physics.enable(this, Phaser.Physics.ARCADE);
@@ -30,17 +34,17 @@ class Adventurer extends Phaser.Sprite {
     this.body.drag.setTo(this.DRAG, 0); // x, y
   }
 
+  // Called on every frame
+  update() {
+    this.move();
+    this.animate();
+  }
   move() {
+    // Left, right, or stopped
     if (this.keyboard.leftInputIsActive()) {
-      // If the LEFT key is down, set the player velocity to move left
-      this.animations.play('walk-left');
       this.body.acceleration.x = -this.ACCELERATION;
     } else if (this.keyboard.rightInputIsActive()) {
-      // If the RIGHT key is down, set the player velocity to move right
-      this.animations.play('walk-right');
       this.body.acceleration.x = this.ACCELERATION;
-    } else if (this.keyboard.downInputIsActive()) {
-      this.animations.play('right-to-neutral')
     } else {
       this.body.acceleration.x = 0;
     }
@@ -67,48 +71,120 @@ class Adventurer extends Phaser.Sprite {
     }
   }
 
-  addAnimations() {
-    this.animations.add('neutral', ['neutral'], 10)
-    this.animations.add('jump', ['jump-3', 'neutral'], 10);
-    this.animations.add('neutral-to-right', [
-      'walk-right-1', 
-      'walk-right-2',
-      'walk-right-3'
-    ], 10);
-    this.animations.add('right-to-neutral', [
-      'walk-right-3',
-      'walk-right-2',
-      'walk-right-1',
-      'neutral'
-    ], 10);
-    this.animations.add('walk-right', [
-      'walk-right-4',
-      'walk-right-5',
-      'walk-right-6',
-      'walk-right-7',
-      'walk-right-8',
-      'walk-right-6'
-    ], 10, true, false);
+  animate() {
+    var animationSpeed = Phaser.Math.mapLinear(
+      Math.abs(this.body.velocity.x),
+      0, // MIN_SPEED
+      this.MAX_SPEED,
+      this.MIN_ANIMATION_SPEED,
+      this.MAX_ANIMATION_SPEED
+    )
 
-    this.animations.add('neutral-to-left', [
-      'walk-left-1', 
-      'walk-left-2',
-      'walk-left-3'
-    ], 20);
-    this.animations.add('left-to-neutral', [
-      'walk-left-3',
-      'walk-left-2',
-      'walk-left-1',
-      'neutral'
-    ], 10);
-    this.animations.add('walk-left', [
+    // Physically moving left
+    if (this.body.velocity.x < 0) {
+      // Speeding up
+      if (this.body.acceleration.x < 0) {
+        // From start
+        if (Math.abs(this.body.velocity.x) < this.TRANSITION_SPEED) {
+          this.animations.play('neutral-to-left');
+        }
+      }
+      // Slowing down
+      else {
+        // To stop
+        if (Math.abs(this.body.velocity.x) < this.TRANSITION_SPEED) {
+          this.animations.play('left-to-neutral');
+        }
+      }
+      // Just crusing (in between transitions)
+      if (Math.abs(this.body.velocity.x) > this.TRANSITION_SPEED) {
+        // Walking animation hasn't started yet
+        if (!this.animateWalkLeft.isPlaying) {
+          this.animateWalkLeft.play(animationSpeed, true);
+        }
+        // Already walking
+        else {
+          this.animateWalkLeft.speed = animationSpeed
+        }
+      }
+    }
+
+    // Physically moving right
+    if (this.body.velocity.x > 0) {
+      // Speeding up
+      if (this.body.acceleration.x > 0) {
+        // From start
+        if (Math.abs(this.body.velocity.x) < this.TRANSITION_SPEED) {
+          this.animations.play('neutral-to-right');
+        }
+      }
+      // Slowing down
+      else {
+        // To stop
+        if (Math.abs(this.body.velocity.x) < this.TRANSITION_SPEED) {
+          this.animations.play('right-to-neutral');
+        }
+      }
+      // Just crusing (in between transitions)
+      if (Math.abs(this.body.velocity.x) > this.TRANSITION_SPEED) {
+        // Walking animation hasn't started yet
+        if (!this.animateWalkRight.isPlaying) {
+          this.animateWalkRight.play(animationSpeed, true);
+        }
+        // Already walking
+        else {
+          this.animateWalkRight.speed = animationSpeed
+        }
+      }
+    }
+  }
+
+  addAnimations() {
+    // Expose walking animations to alter speed
+    this.animateWalkLeft = this.animations.add('walk-left', [
       'walk-left-4',
       'walk-left-5',
       'walk-left-6',
       'walk-left-7',
       'walk-left-8',
       'walk-left-6'
-    ], 10, true, false);
+    ]);
+
+    this.animateWalkRight = this.animations.add('walk-right', [
+      'walk-right-4',
+      'walk-right-5',
+      'walk-right-6',
+      'walk-right-7',
+      'walk-right-8',
+      'walk-right-6'
+    ]);
+
+    // Transitions
+    this.animations.add('neutral-to-left', [
+      'walk-left-1',
+      'walk-left-2',
+      'walk-left-3'
+    ], this.TRANSITION_ANIMATION_SPEED, false);
+
+    this.animations.add('left-to-neutral', [
+      'walk-left-3',
+      'walk-left-2',
+      'walk-left-1',
+      'neutral'
+    ], this.TRANSITION_ANIMATION_SPEED, false);
+
+    this.animations.add('neutral-to-right', [
+      'walk-right-1', 
+      'walk-right-2',
+      'walk-right-3'
+    ], this.TRANSITION_ANIMATION_SPEED, false);
+
+    this.animations.add('right-to-neutral', [
+      'walk-right-3',
+      'walk-right-2',
+      'walk-right-1',
+      'neutral'
+    ], this.TRANSITION_ANIMATION_SPEED, false);
   }
 }
 
