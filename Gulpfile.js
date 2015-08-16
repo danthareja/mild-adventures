@@ -168,6 +168,10 @@ function serve() {
   gulp.watch(ASSETS_PATH + '/**/*', ['watch:static']).on('change', function() {
     keepFiles = true;
   });
+
+  gulp.watch(INDEX_PATH, ['watch:static']).on('change', function() {
+    keepFiles = true;
+  });
 }
 
 
