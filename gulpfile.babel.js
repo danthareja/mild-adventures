@@ -18,14 +18,17 @@ var htmlreplace = require('gulp-html-replace');
 /**
  * Using different folders/file names? Change these constants:
  */
-var PHASER_PATH = './node_modules/phaser/build/';
-var BUILD_PATH = './build';
-var SCRIPTS_PATH = BUILD_PATH + '/js';
-var SOURCE_PATH = './src';
-var ASSETS_PATH = './assets';
-var INDEX_PATH = './index.html';
-var ENTRY_FILE = './src/game.js';
-var OUTPUT_FILE = 'game.js';
+const BUILD_PATH = './build';
+const SCRIPTS_PATH = BUILD_PATH + '/js';
+const SOURCE_PATH = './src';
+const ASSETS_PATH = './assets';
+const INDEX_PATH = './index.html';
+const ENTRY_FILE = './src/game.js';
+const OUTPUT_FILE = 'game.js';
+const DEPENDENCIES_PATHS = {
+  phaser: './node_modules/phaser/build/',
+  gyronorm: './node_modules/gyronorm/'
+};
 
 var keepFiles = false;
 
@@ -72,7 +75,7 @@ function cleanBuild() {
 function copyIndex() {
   return gulp.src(INDEX_PATH)
     .pipe(gulpif(isProduction(), htmlreplace({
-      'js': 'js/phaser.min.js'
+      'js': ['js/phaser.min.js', 'js/gyronorm.min.js']
     })))
     .pipe(gulp.dest(BUILD_PATH));
 }
@@ -102,20 +105,24 @@ function copyStatic() {
  * Copies required Phaser files from the './node_modules/Phaser' folder into the './build/scripts' folder.
  * This way you can call 'npm update', get the lastest Phaser version and use it on your project with ease.
  */
-function copyPhaser() {
-  var srcList = ['phaser.min.js'];
-  
-  if (!isProduction()) {
-    srcList.push('phaser.map', 'phaser.js');
+function copyDependencies() {
+  var srcList = {
+    phaser: ['phaser.min.js'],
+    gyronorm: ['dist/gyronorm.min.js']
   }
   
-  srcList = srcList.map(function(file) {
-    return PHASER_PATH + file;
-  });
-    
+  if (!isProduction()) {
+    srcList.phaser.push('phaser.map', 'phaser.js');
+    srcList.gyronorm.push('lib/gyronorm.js');
+  }
+  
+  srcList = Object.keys(srcList).reduce(function(mapped, lib) {
+    return srcList[lib].map(function(file) {
+      return DEPENDENCIES_PATHS[lib] + file
+    }).concat(mapped);
+  }, []);
   return gulp.src(srcList)
     .pipe(gulp.dest(SCRIPTS_PATH));
-
 }
 
 /**
@@ -187,18 +194,18 @@ function deploy() {
 
 gulp.task('cleanBuild', cleanBuild);
 gulp.task('copyStatic', ['cleanBuild'], copyStatic);
-gulp.task('copyPhaser', ['copyStatic'], copyPhaser);
-gulp.task('build', ['copyPhaser'], build);
+gulp.task('copyDependencies', ['copyStatic'], copyDependencies);
+gulp.task('build', ['copyDependencies'], build);
 gulp.task('fastBuild', build);
 gulp.task('serve', ['build'], serve);
 gulp.task('watch:js', ['fastBuild'], browserSync.reload); // Rebuilds and reloads the project when executed.
-gulp.task('watch:static', ['copyPhaser'], browserSync.reload);
+gulp.task('watch:static', ['copyDependencies'], browserSync.reload);
 gulp.task('toggleProduction', toggleProduction);
 gulp.task('deploy', ['toggleProduction', 'build'], deploy);
 
 /**
  * The tasks are executed in the following order:
- * 'cleanBuild' -> 'copyStatic' -> 'copyPhaser' -> 'build' -> 'serve'
+ * 'cleanBuild' -> 'copyStatic' -> 'copyDependencies' -> 'build' -> 'serve'
  * 
  * Read more about task dependencies in Gulp: 
  * https://medium.com/@dave_lunny/task-dependencies-in-gulp-b885c1ab48f0
