@@ -11,15 +11,15 @@ class BootState {
 
     if (this.game.device.desktop) {
      this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-     this.scale.setMinMax(480, 260, 1024, 768);
+     this.scale.setMinMax(480, 360, 1024, 768);
      this.scale.pageAlignHorizontally = true;
      this.scale.pageAlignVertically = true;
      this.game.orientated = true;
     } else {
      this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-     this.scale.setMinMax(480, 260, 1024, 768);
+     this.scale.setMinMax(480, 360, 1024, 768);
      this.scale.pageAlignHorizontally = true;
-     // this.scale.pageAlignVertically = true;
+     this.scale.pageAlignVertically = true;
      this.scale.forceOrientation(true, false);
      this.scale.setResizeCallback(this.gameResized, this);
      this.scale.enterIncorrectOrientation.add(this.enterIncorrectOrientation, this);
@@ -47,7 +47,7 @@ class BootState {
     // This could be handy if you need to do any extra processing if the game resizes.
     // A resize could happen if for example swapping orientation on a device or resizing the browser window.
     // Note that this callback is only really useful if you use a ScaleMode of RESIZE and place it inside your main game state.
-    console.log('gameResized called ${width}x${height}')
+    console.log(`gameResized: ${width}x${height}`)
   }
 
   enterIncorrectOrientation() {
