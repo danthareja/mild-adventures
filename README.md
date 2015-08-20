@@ -1,6 +1,6 @@
-# The Mild Adventurer's Club
+# Bub's Mild Adventures
 
-There's not much to do yet, but stay tuned!
+[Play it here](http://danthareja.github.io/mild-adventures)
 
 ## How to build locally
 
